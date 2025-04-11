@@ -1,0 +1,111 @@
+from tabulate import tabulate
+
+# Data menu makanan (array of dictionary)
+menu = [
+    {"nama": "Nasi Goreng", "harga": 15000},
+    {"nama": "Mie Ayam", "harga": 12000},
+    {"nama": "Ayam Geprek", "harga": 18000},
+    {"nama": "Soto Ayam", "harga": 13000},
+    {"nama": "Bakso", "harga": 14000}
+]
+
+# Merge Sort untuk mengurutkan menu berdasarkan harga atau nama
+def merge_sort(arr, key):
+    if len(arr) > 1:
+        mid = len(arr) // 2
+        left_half = arr[:mid]
+        right_half = arr[mid:]
+
+        merge_sort(left_half, key)
+        merge_sort(right_half, key)
+
+        i = j = k = 0
+        while i < len(left_half) and j < len(right_half):
+            if left_half[i][key] < right_half[j][key]:
+                arr[k] = left_half[i]
+                i += 1
+            else:
+                arr[k] = right_half[j]
+                j += 1
+            k += 1
+
+        while i < len(left_half):
+            arr[k] = left_half[i]
+            i += 1
+            k += 1
+
+        while j < len(right_half):
+            arr[k] = right_half[j]
+            j += 1
+            k += 1
+
+# Interpolation Search untuk mencari harga makanan
+def interpolation_search(arr, harga):
+    low, high = 0, len(arr) - 1
+
+    while low <= high and harga >= arr[low]["harga"] and harga <= arr[high]["harga"]:
+        if low == high:
+            if arr[low]["harga"] == harga:
+                return low
+            return -1
+
+        pos = low + ((harga - arr[low]["harga"]) * (high - low) // (arr[high]["harga"] - arr[low]["harga"]))
+
+        if arr[pos]["harga"] == harga:
+            return pos
+        elif arr[pos]["harga"] < harga:
+            low = pos + 1
+        else:
+            high = pos - 1
+
+    return -1
+
+# Menampilkan menu makanan dengan tabulate
+def tampilkan_menu():
+    print("\nDaftar Menu Makanan:")
+    print(tabulate(menu, headers="keys", tablefmt="grid"))
+
+# Menambah menu makanan
+def tambah_menu():
+    nama = input("Masukkan nama makanan: ")
+    harga = int(input("Masukkan harga makanan: "))
+    menu.append({"nama": nama, "harga": harga})
+    print("Menu berhasil ditambahkan!")
+
+# Program utama
+while True:
+    print("\n=== APLIKASI MENU MAKANAN TOKO MELKI ===")
+    print("1. Tampilkan Menu")
+    print("2. Urutkan Menu (Harga)")
+    print("3. Urutkan Menu (Nama)")
+    print("4. Cari Menu berdasarkan Harga")
+    print("5. Tambah Menu")
+    print("6. Keluar")
+
+    pilihan = input("Pilih menu: ")
+
+    if pilihan == "1":
+        tampilkan_menu()
+    elif pilihan == "2":
+        merge_sort(menu, "harga")
+        print("Menu berhasil diurutkan berdasarkan harga!")
+        tampilkan_menu()
+    elif pilihan == "3":
+        merge_sort(menu, "nama")
+        print("Menu berhasil diurutkan berdasarkan nama!")
+        tampilkan_menu()
+    elif pilihan == "4":
+        harga_cari = int(input("Masukkan harga makanan yang dicari: "))
+        merge_sort(menu, "harga")  # Pastikan sudah diurutkan
+        hasil = interpolation_search(menu, harga_cari)
+        if hasil != -1:
+            print(f"Menu ditemukan: {menu[hasil]['nama']} - Rp {menu[hasil]['harga']}")
+        else:
+            print("Menu dengan harga tersebut tidak ditemukan.")
+    elif pilihan == "5":
+        tambah_menu()
+    elif pilihan == "6":
+        print("Terima kasih! Program selesai.")
+        break
+    else:
+        print("Pilihan tidak valid, coba lagi.")
